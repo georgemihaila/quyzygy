@@ -1,0 +1,40 @@
+﻿@using Microsoft.AspNetCore.Identity
+@using Quyzygy.Entities;
+@inject SignInManager<ApplicationUser> SignInManager
+@inject UserManager<ApplicationUser> UserManager
+@if (SignInManager.IsSignedIn(User))
+{
+    ViewData["Title"] = "Dashboard";
+}
+else
+{
+    ViewData["Title"] = "Home";
+    <div class="center">
+        <div class="col s12 m6">
+            <div class="card blue-grey darken-1">
+                <div class="card-content white-text">
+                    <span class="card-title">Welcome to Quyzygy!</span>
+                    <p>
+                        Quyzygy is a platform for both students and teachers, designed with the intent of making learning easier.
+                    </p>
+                </div>
+                <div class="card-action">
+                    <a href="About">Read more</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="center">
+        <div class="col s12 m6">
+            <div class="card blue-grey darken-1">
+                <div class="card-content white-text">
+                    <span class="card-title">Are you a student or a teacher?</span>
+                </div>
+                <div class="card-action">
+                    <a href="Login">Log in / Sign up</a>
+                </div>
+            </div>
+        </div>
+    </div>
+}

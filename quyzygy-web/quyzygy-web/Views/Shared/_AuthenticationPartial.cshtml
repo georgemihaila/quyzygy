@@ -1,0 +1,24 @@
+﻿@using Microsoft.AspNetCore.Identity
+@using Quyzygy.Entities;
+
+@inject SignInManager<ApplicationUser> SignInManager
+@inject UserManager<ApplicationUser> UserManager
+
+@if (SignInManager.IsSignedIn(User))
+{
+    <script type="text/javascript">
+        function getXSRFToken() {
+            var token = '@Html.AntiForgeryToken()';
+            token = $(token).val();
+            return token;
+        }
+    </script>
+    <li><a href="/">Dashboard</a></li>
+}
+else
+{
+
+    <li><a href="/">Home</a></li>
+    <li><a href="About">About</a></li>
+    <li><a href="Login" class="waves-effect waves-light btn"><i class="material-icons right">keyboard_arrow_right</i>Log in</a></li>
+}
