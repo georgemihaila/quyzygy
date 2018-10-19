@@ -28,12 +28,13 @@ namespace Quyzygy
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            using (SqlInitializer initializer = new SqlInitializer("Dependencies/Initialization/Sql-instructions",
+                Configuration.GetConnectionString("CreationConnection")))
+            {
+                initializer.Initialize();
+            }
+
             Globals.SqlExpressHelper.Initialize(Configuration.GetConnectionString("DefaultConnection"));
-            SqlInitializer initializer = new SqlInitializer(
-               "Dependencies/Initialization/Sql-instructions",
-                Configuration.GetConnectionString("CreationConnection"));
-            initializer.Initialize();
-            initializer.Dispose();
 
             services.Configure<CookiePolicyOptions>(options =>
             {
