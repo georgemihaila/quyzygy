@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.27703.2018
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "quyzygy-web", "quyzygy-web\quyzygy-web.csproj", "{38B7F7CF-F1CC-425E-A972-C61D4DF9B498}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "quyzygy-web", "quyzygy-web\quyzygy-web.csproj", "{BFE506F3-6EBF-4D48-8A9A-92647EC0A1F8}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -11,15 +11,15 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{38B7F7CF-F1CC-425E-A972-C61D4DF9B498}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{38B7F7CF-F1CC-425E-A972-C61D4DF9B498}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{38B7F7CF-F1CC-425E-A972-C61D4DF9B498}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{38B7F7CF-F1CC-425E-A972-C61D4DF9B498}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BFE506F3-6EBF-4D48-8A9A-92647EC0A1F8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BFE506F3-6EBF-4D48-8A9A-92647EC0A1F8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BFE506F3-6EBF-4D48-8A9A-92647EC0A1F8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BFE506F3-6EBF-4D48-8A9A-92647EC0A1F8}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
-		SolutionGuid = {10BEB996-39BA-4265-8E72-74FA7FD8CAED}
+		SolutionGuid = {1E78D66F-7A7E-4122-B9B4-6558D935189A}
 	EndGlobalSection
 EndGlobal
