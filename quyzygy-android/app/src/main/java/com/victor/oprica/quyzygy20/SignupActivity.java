@@ -10,6 +10,13 @@ import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.Toast;
 
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.OutputStreamWriter;
@@ -77,18 +84,27 @@ public class SignupActivity extends AppCompatActivity {
         }
         else {
             //save to DB
-            String type = ((RadioButton)findViewById(rg_type.getCheckedRadioButtonId())).getText().toString();
+            RequestQueue queue = Volley.newRequestQueue(this);
+            String url = "http://192.168.0.103/SignUp?username=" + ed_username.getText() + "&password=" + ed_pw.getText() + "&usertype=" + (((RadioButton)findViewById(rg_type.getCheckedRadioButtonId())).getText().toString());
+            StringRequest stringRequest = new StringRequest(Request.Method.POST, url,
+                    new Response.Listener<String>() {
+                        @Override
+                        public void onResponse(String response) {
+                            String type = ((RadioButton)findViewById(rg_type.getCheckedRadioButtonId())).getText().toString();
 
-            Toast.makeText(getApplicationContext(),ed_username.getText().toString() + " " + ed_pw.getText().toString() + " " + type , Toast.LENGTH_LONG).show();
+                            Toast.makeText(getApplicationContext(),ed_username.getText().toString() + " " + ed_pw.getText().toString() + " " + type , Toast.LENGTH_LONG).show();
 
-            saveData(ed_username.getText().toString() + " " + ed_pw.getText().toString() + " " + type +",");
+                            navigateToMainActivity(getCurrentFocus());
+                        }
+                    }, new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                    Toast.makeText(getApplicationContext(), error.toString(), Toast.LENGTH_LONG).show();
+                }
+            });
+            queue.add(stringRequest);
 
-            navigateToMainActivity(getCurrentFocus());
+
         }
-    }
-
-    public void saveData(String text){
-
-
     }
 }

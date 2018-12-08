@@ -14,6 +14,11 @@ import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.android.volley.*;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
+import com.google.gson.Gson;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
@@ -21,6 +26,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.lang.reflect.Type;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -81,9 +87,6 @@ public class MainActivity extends AppCompatActivity {
             else{
                 Toast.makeText(getApplicationContext(),"Incorrect username or password.", Toast.LENGTH_LONG).show();
             }
-
-
-
         }
 
 
@@ -108,16 +111,36 @@ public class MainActivity extends AppCompatActivity {
         }
 
         public void login(){ //metoda ce va trimite spre activitatea urmatoare de intrare in "camera"
-            //Toast.makeText(getApplicationContext(),"Login method reached",Toast.LENGTH_LONG).show();
+            RequestQueue queue = Volley.newRequestQueue(this);
 
-            if(et_username.getText().toString().startsWith("S") || et_username.getText().toString().startsWith("s")) {
-                Intent explicitIntent = new Intent(MainActivity.this, EnterRoomActivity.class);
-                startActivity(explicitIntent);
-            }
-            else {
-                Intent explicitIntent = new Intent(MainActivity.this, ProffesorBoardActivity.class);
-                startActivity(explicitIntent);
-            }
+            String url = "http://192.168.0.103/Login?username=" + et_username.getText() + "&password=" + et_password.getText();
+            StringRequest stringRequest = new StringRequest(Request.Method.POST, url,
+                    new Response.Listener<String>() {
+                        @Override
+                        public void onResponse(String response) {
+                            //TODO: save secret key locally
+
+                            LoginResult result = new LoginResult();
+                            Type t = result.getClass();
+                            result = new Gson().fromJson(response, t);
+                            //Toast.makeText(getApplicationContext(), result.Key + " " + result.UserType, Toast.LENGTH_LONG).show();
+
+                            if(result.UserType.toLowerCase() == "student") {
+                                Intent explicitIntent = new Intent(MainActivity.this, EnterRoomActivity.class);
+                                startActivity(explicitIntent);
+                            }
+                            else { //Is teacher
+                                Intent explicitIntent = new Intent(MainActivity.this, ProffesorBoardActivity.class);
+                                startActivity(explicitIntent);
+                            }
+                        }
+                    }, new Response.ErrorListener() {
+                        @Override
+                        public void onErrorResponse(VolleyError error) {
+                            Toast.makeText(getApplicationContext(), error.toString(), Toast.LENGTH_LONG).show();
+                        }
+            });
+            queue.add(stringRequest);
         }
 
 

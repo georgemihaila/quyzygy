@@ -161,7 +161,6 @@ public class QuizActivity extends AppCompatActivity {
         answer2.setText(mQuestions.getChoice2(num));
         answer3.setText(mQuestions.getChoice3(num));
         answer4.setText(mQuestions.getChoice4(num));
-        Type t =
         mAnswer = mQuestions.getCorrectAnswer(num);
     }
 
