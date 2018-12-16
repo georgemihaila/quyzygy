@@ -31,9 +31,9 @@ import java.lang.reflect.Type;
 public class MainActivity extends AppCompatActivity {
 
 
-    private EditText et_username, et_password;
+    private EditText et_email, et_password;
     private CheckBox cb_rememberme;
-    private String username, password;
+    private String email, password;
     private Button btn_login;
     private SharedPreferences loginPreferences;
     private SharedPreferences.Editor loginPrefsEditor;
@@ -45,7 +45,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         btn_login = (Button) findViewById(R.id.btn_login);
-        et_username = (EditText) findViewById(R.id.et_username);
+        et_email = (EditText) findViewById(R.id.et_email);
         et_password = (EditText) findViewById(R.id.et_password);
         cb_rememberme = (CheckBox) findViewById(R.id.cb_rememberuser);
         loginPreferences = getSharedPreferences("loginPrefs", MODE_PRIVATE);
@@ -58,7 +58,7 @@ public class MainActivity extends AppCompatActivity {
         public void readLoginData (){ //verifica daca a fost bifat remember me si actioneaza ca atare
             saveLogin = loginPreferences.getBoolean("saveLogin", false);
             if (saveLogin == true) {
-                et_username.setText(loginPreferences.getString("username", ""));
+                et_email.setText(loginPreferences.getString("username", ""));
                 et_password.setText(loginPreferences.getString("password", ""));
                 cb_rememberme.setChecked(true);
             }
@@ -70,9 +70,9 @@ public class MainActivity extends AppCompatActivity {
         }
 
         public void checkuser (View view){ // metoda ce va fi apelata inainte de save login pt a verifica daca userul si parola se afla in bd
-            if (et_username.getText().toString().isEmpty()){ // verificam in baza de date daca exista conturile
-                et_username.setText("");
-                et_username.setHint("Insert username");
+            if (et_email.getText().toString().isEmpty()){ // verificam in baza de date daca exista conturile
+                et_email.setText("");
+                et_email.setHint("Insert username");
                 //Toast.makeText(getApplicationContext(),"Insert username.", Toast.LENGTH_LONG).show();
             }
             else if(et_password.getText().toString().isEmpty()){
@@ -93,14 +93,14 @@ public class MainActivity extends AppCompatActivity {
         public void saveLogin(View view) { //salveaza local userul si parola daca a fost bifat remember me
             if (view == btn_login) {
                 InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-                imm.hideSoftInputFromWindow(et_username.getWindowToken(), 0);
+                imm.hideSoftInputFromWindow(et_email.getWindowToken(), 0);
 
-                username = et_username.getText().toString();
+                email = et_email.getText().toString();
                 password = et_password.getText().toString();
 
                 if (cb_rememberme.isChecked()) {
                     loginPrefsEditor.putBoolean("saveLogin", true);
-                    loginPrefsEditor.putString("username", username);
+                    loginPrefsEditor.putString("username", email);
                     loginPrefsEditor.putString("password", password);
                     loginPrefsEditor.commit();
                 } else {
@@ -113,7 +113,7 @@ public class MainActivity extends AppCompatActivity {
         public void login(){ //metoda ce va trimite spre activitatea urmatoare de intrare in "camera"
             RequestQueue queue = Volley.newRequestQueue(this);
 
-            String url = "http://192.168.0.103/Login?username=" + et_username.getText() + "&password=" + et_password.getText();
+            String url = "http://192.168.0.103/Login?username=" + et_email.getText() + "&password=" + et_password.getText();
             StringRequest stringRequest = new StringRequest(Request.Method.POST, url,
                     new Response.Listener<String>() {
                         @Override

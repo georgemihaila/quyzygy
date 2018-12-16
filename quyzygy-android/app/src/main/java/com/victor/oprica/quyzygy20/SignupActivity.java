@@ -10,20 +10,30 @@ import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.Toast;
 
+import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.OutputStreamWriter;
+import java.lang.reflect.Type;
+import java.util.HashMap;
+import java.util.Map;
 
 public class SignupActivity extends AppCompatActivity {
 
-    EditText ed_username, ed_pw, ed_pw2;
+    EditText ed_email, ed_firstName, ed_lastName, ed_pw, ed_pw2;
     RadioGroup rg_type;
 
     @Override
@@ -31,7 +41,9 @@ public class SignupActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_signup);
 
-        ed_username = (EditText)findViewById(R.id.et_username);
+        ed_email = (EditText)findViewById(R.id.et_email);
+        ed_firstName = (EditText)findViewById(R.id.et_firstName);
+        ed_lastName = (EditText)findViewById(R.id.et_lastName);
         ed_pw = (EditText)findViewById(R.id.et_password);
         ed_pw2 = (EditText) findViewById(R.id.et_password2);
         rg_type = (RadioGroup)findViewById(R.id.rg_accountType);
@@ -43,23 +55,23 @@ public class SignupActivity extends AppCompatActivity {
         startActivity(explicitIntent);
     }
 
-    public void register(View view){
+    public void register(View view) throws JSONException {
 
-        if(ed_username.getText().toString().isEmpty()){
-            ed_username.setText("");
-            ed_username.setHint("Username is empty");
+        if(ed_email.getText().toString().isEmpty()){
+            ed_email.setText("");
+            ed_email.setHint("Username is empty");
         }
-        else if (ed_username.getText().toString().length() < 6){
-            ed_username.setText("");
-            ed_username.setHint("Username too short");
+        else if (ed_email.getText().toString().length() < 6){
+            ed_email.setText("");
+            ed_email.setHint("Username too short");
         }
-        else if (ed_username.getText().toString().length() >32){
-            ed_username.setText("");
-            ed_username.setHint("Username too long");
+        else if (ed_email.getText().toString().length() >32){
+            ed_email.setText("");
+            ed_email.setHint("Username too long");
         }
-        else if (ed_username.getText().toString().contains(" ")){
-            ed_username.setText("");
-            ed_username.setHint("No space allowed");
+        else if (ed_email.getText().toString().contains(" ")){
+            ed_email.setText("");
+            ed_email.setHint("No space allowed");
         }
         else if (ed_pw.getText().toString().isEmpty()){
             ed_pw.setText("");
@@ -84,27 +96,53 @@ public class SignupActivity extends AppCompatActivity {
         }
         else {
             //save to DB
-            RequestQueue queue = Volley.newRequestQueue(this);
-            String url = "http://192.168.0.103/SignUp?username=" + ed_username.getText() + "&password=" + ed_pw.getText() + "&usertype=" + (((RadioButton)findViewById(rg_type.getCheckedRadioButtonId())).getText().toString());
-            StringRequest stringRequest = new StringRequest(Request.Method.POST, url,
-                    new Response.Listener<String>() {
-                        @Override
-                        public void onResponse(String response) {
-                            String type = ((RadioButton)findViewById(rg_type.getCheckedRadioButtonId())).getText().toString();
 
-                            Toast.makeText(getApplicationContext(),ed_username.getText().toString() + " " + ed_pw.getText().toString() + " " + type , Toast.LENGTH_LONG).show();
 
-                            navigateToMainActivity(getCurrentFocus());
-                        }
-                    }, new Response.ErrorListener() {
+
+            String url = "https://webtech-opricavictor.c9users.io:8080/register";
+
+//create post data as JSONObject - if your are using JSONArrayRequest use obviously an JSONArray :)
+            JSONObject jsonBody = new JSONObject("{\"firstName\":\"" + ed_firstName.getText() +
+                                                 "\",\"lastName\":\"" + ed_lastName.getText() +
+                                                 "\",\"email\":\"" + ed_email.getText() +
+                                                 "\",\"passwordHash\":\"" + ed_pw.getText() +
+                                                 "\",\"userType\":\"" + ((RadioButton)findViewById(rg_type.getCheckedRadioButtonId())).getText().toString() + "\"}");
+
+
+//request a json object response
+            JsonObjectRequest jsonRequest = new JsonObjectRequest(Request.Method.POST, url, jsonBody, new Response.Listener<JSONObject>() {
+                @Override
+                public void onResponse(JSONObject response) {
+
+                    //now handle the response
+                    Toast.makeText(SignupActivity.this, "response", Toast.LENGTH_SHORT).show();
+
+                }
+            }, new Response.ErrorListener() {
                 @Override
                 public void onErrorResponse(VolleyError error) {
-                    Toast.makeText(getApplicationContext(), error.toString(), Toast.LENGTH_LONG).show();
+
+                    //handle the error
+                    Toast.makeText(SignupActivity.this, "An error occurred", Toast.LENGTH_SHORT).show();
+                    error.printStackTrace();
+
                 }
-            });
-            queue.add(stringRequest);
+            }) {    //this is the part, that adds the header to the request
+                @Override
+                public Map<String, String> getHeaders() {
+                    Map<String, String> params = new HashMap<String, String>();
+                    //params.put("x-vacationtoken", "secret_token");
+                    params.put("content-type", "application/json");
+                    return params;
+                }
+            };
+
+// Add the request to the queue
+            Volley.newRequestQueue(this).add(jsonRequest);
 
 
         }
     }
+
+
 }
