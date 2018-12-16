@@ -337,7 +337,19 @@ async function validateUser(request){
 async function getEmailForLoggedUser(request){
 	try {
 		var sel = await AuthenticatedUsers.findAll()
-		return sel[0].Email
+			for (var j = 0; j < sel.length; j++){
+			var existingSKs = [];
+			try{
+				existingSKs = JSON.parse(sel[j].SecretKeys)
+			}
+			catch (e){
+
+			}
+			for (var i = 0; i < existingSKs.length; i++)
+				if (existingSKs[i] == request.param('sk')){
+					return sel[j].Email
+				}
+			}
 	}
 	catch(e){
 		console.warn(e)
