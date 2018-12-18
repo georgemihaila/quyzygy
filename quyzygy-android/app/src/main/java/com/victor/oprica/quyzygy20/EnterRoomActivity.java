@@ -15,7 +15,7 @@ public class EnterRoomActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_enter_room);
-        Toast.makeText(getApplicationContext(),"Invite code: pistoale",Toast.LENGTH_LONG).show();
+        //Toast.makeText(getApplicationContext(),"Invite code: pistoale",Toast.LENGTH_LONG).show();
         et_invite = (EditText)findViewById(R.id.et_invitecode);
     }
 

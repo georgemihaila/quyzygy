@@ -18,16 +18,12 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.OutputStreamWriter;
-import java.lang.reflect.Type;
+
+import java.security.*;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -55,7 +51,7 @@ public class SignupActivity extends AppCompatActivity {
         startActivity(explicitIntent);
     }
 
-    public void register(View view) throws JSONException {
+    public void register(View view) throws JSONException, NoSuchAlgorithmException {
 
         if(ed_email.getText().toString().isEmpty()){
             ed_email.setText("");
@@ -99,23 +95,30 @@ public class SignupActivity extends AppCompatActivity {
 
 
 
+            //String url = "http://quyzygy.us/register";
+
             String url = "https://webtech-opricavictor.c9users.io:8080/register";
 
 //create post data as JSONObject - if your are using JSONArrayRequest use obviously an JSONArray :)
-            JSONObject jsonBody = new JSONObject("{\"firstName\":\"" + ed_firstName.getText() +
-                                                 "\",\"lastName\":\"" + ed_lastName.getText() +
-                                                 "\",\"email\":\"" + ed_email.getText() +
-                                                 "\",\"passwordHash\":\"" + ed_pw.getText() +
+
+            String hash = Sha.hash256(ed_pw.getText().toString());
+
+            //Toast.makeText(getApplicationContext(), hash, Toast.LENGTH_LONG).show();
+
+            JSONObject jsonBody = new JSONObject("{\"firstName\":\"" + ed_firstName.getText().toString() +
+                                                 "\",\"lastName\":\"" + ed_lastName.getText().toString() +
+                                                 "\",\"email\":\"" + ed_email.getText().toString() +
+                                                 "\",\"passwordHash\":\"" + hash +
                                                  "\",\"userType\":\"" + ((RadioButton)findViewById(rg_type.getCheckedRadioButtonId())).getText().toString() + "\"}");
 
-
+            //Toast.makeText(getApplicationContext(), hash.length(), Toast.LENGTH_SHORT).show();
 //request a json object response
             JsonObjectRequest jsonRequest = new JsonObjectRequest(Request.Method.POST, url, jsonBody, new Response.Listener<JSONObject>() {
                 @Override
                 public void onResponse(JSONObject response) {
 
                     //now handle the response
-                    Toast.makeText(SignupActivity.this, "response", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(SignupActivity.this, "Successfully signed up.", Toast.LENGTH_LONG).show();
 
                 }
             }, new Response.ErrorListener() {
@@ -123,7 +126,7 @@ public class SignupActivity extends AppCompatActivity {
                 public void onErrorResponse(VolleyError error) {
 
                     //handle the error
-                    Toast.makeText(SignupActivity.this, "An error occurred", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(SignupActivity.this, "An error occurred.", Toast.LENGTH_LONG).show();
                     error.printStackTrace();
 
                 }
@@ -131,7 +134,6 @@ public class SignupActivity extends AppCompatActivity {
                 @Override
                 public Map<String, String> getHeaders() {
                     Map<String, String> params = new HashMap<String, String>();
-                    //params.put("x-vacationtoken", "secret_token");
                     params.put("content-type", "application/json");
                     return params;
                 }
@@ -146,3 +148,6 @@ public class SignupActivity extends AppCompatActivity {
 
 
 }
+
+
+

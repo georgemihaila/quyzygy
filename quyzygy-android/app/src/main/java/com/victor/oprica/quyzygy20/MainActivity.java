@@ -15,9 +15,13 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import com.android.volley.*;
+import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.google.gson.Gson;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -27,6 +31,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.lang.reflect.Type;
+import java.security.NoSuchAlgorithmException;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -69,7 +77,7 @@ public class MainActivity extends AppCompatActivity {
             startActivityForResult(explicitIntent, 1);
         }
 
-        public void checkuser (View view){ // metoda ce va fi apelata inainte de save login pt a verifica daca userul si parola se afla in bd
+        public void checkuser (View view) throws JSONException, NoSuchAlgorithmException { // metoda ce va fi apelata inainte de save login pt a verifica daca userul si parola se afla in bd
             if (et_email.getText().toString().isEmpty()){ // verificam in baza de date daca exista conturile
                 et_email.setText("");
                 et_email.setHint("Insert username");
@@ -110,8 +118,8 @@ public class MainActivity extends AppCompatActivity {
             }
         }
 
-        public void login(){ //metoda ce va trimite spre activitatea urmatoare de intrare in "camera"
-            RequestQueue queue = Volley.newRequestQueue(this);
+        public void login() throws JSONException, NoSuchAlgorithmException { //metoda ce va trimite spre activitatea urmatoare de intrare in "camera"
+            /*RequestQueue queue = Volley.newRequestQueue(this);
 
             String url = "http://192.168.0.103/Login?username=" + et_email.getText() + "&password=" + et_password.getText();
             StringRequest stringRequest = new StringRequest(Request.Method.POST, url,
@@ -120,7 +128,7 @@ public class MainActivity extends AppCompatActivity {
                         public void onResponse(String response) {
                             //TODO: save secret key locally
 
-                            LoginResult result = new LoginResult();
+
                             Type t = result.getClass();
                             result = new Gson().fromJson(response, t);
                             //Toast.makeText(getApplicationContext(), result.Key + " " + result.UserType, Toast.LENGTH_LONG).show();
@@ -140,7 +148,59 @@ public class MainActivity extends AppCompatActivity {
                             Toast.makeText(getApplicationContext(), error.toString(), Toast.LENGTH_LONG).show();
                         }
             });
-            queue.add(stringRequest);
+            queue.add(stringRequest);  */
+
+            String url = "https://webtech-opricavictor.c9users.io:8080/login";
+            String loginhash = Sha.hash256(et_password.getText().toString());
+//create post data as JSONObject - if your are using JSONArrayRequest use obviously an JSONArray :)
+            final JSONObject jsonBody = new JSONObject("{\"email\":\"" + et_email.getText() +
+                    "\",\"passwordHash\":\"" + loginhash + "\"}");
+
+
+
+
+//request a json object response
+            JsonObjectRequest jsonRequest = new JsonObjectRequest(Request.Method.POST, url, jsonBody, new Response.Listener<JSONObject>() {
+                @Override
+                public void onResponse(JSONObject response) {
+
+                    //now handle the response
+                    String[] temp = response.toString().split("\"");
+
+
+                    loginPrefsEditor.putString("sk", temp[3]);
+                    loginPrefsEditor.commit();
+
+                    Toast.makeText(getApplicationContext(), loginPreferences.getString("sk", ""),Toast.LENGTH_LONG).show();
+
+
+                    Intent explicitIntent = new Intent(MainActivity.this, EnterRoomActivity.class);
+                    startActivityForResult(explicitIntent, 1);
+
+                }
+            }, new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+
+                    //handle the error
+                    Toast.makeText(MainActivity.this, "An error occurred.", Toast.LENGTH_SHORT).show();
+                    error.printStackTrace();
+
+                }
+            }) {    //this is the part, that adds the header to the request
+                @Override
+                public Map<String, String> getHeaders() {
+                    Map<String, String> params = new HashMap<String, String>();
+                    params.put("content-type", "application/json");
+                    return params;
+                }
+            };
+
+// Add the request to the queue
+            Volley.newRequestQueue(this).add(jsonRequest);
+
+
+
         }
 
 
