@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.RadioButton;
@@ -11,10 +12,13 @@ import android.widget.RadioGroup;
 import android.widget.Toast;
 
 import com.android.volley.AuthFailureError;
+import com.android.volley.NetworkResponse;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
+import com.android.volley.VolleyLog;
+import com.android.volley.toolbox.HttpHeaderParser;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
@@ -23,6 +27,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 
+import java.io.UnsupportedEncodingException;
 import java.security.*;
 import java.util.HashMap;
 import java.util.Map;
@@ -93,54 +98,64 @@ public class SignupActivity extends AppCompatActivity {
         else {
             //save to DB
 
-
-
-            //String url = "http://quyzygy.us/register";
-
-            String url = "https://webtech-opricavictor.c9users.io:8080/register";
-
-//create post data as JSONObject - if your are using JSONArrayRequest use obviously an JSONArray :)
+            String url = "http://quyzygy.us/register";
 
             String hash = Sha.hash256(ed_pw.getText().toString());
 
-            //Toast.makeText(getApplicationContext(), hash, Toast.LENGTH_LONG).show();
+            try {
+                RequestQueue requestQueue = Volley.newRequestQueue(this);
+                String URL = "http://quyzygy.us/register";
+                final String requestBody = "{\"firstName\":\"" + ed_firstName.getText().toString() +
+                        "\",\"lastName\":\"" + ed_lastName.getText().toString() +
+                        "\",\"email\":\"" + ed_email.getText().toString() +
+                        "\",\"passwordHash\":\"" + hash +
+                        "\",\"userType\":\"" + ((RadioButton)findViewById(rg_type.getCheckedRadioButtonId())).getText().toString() + "\"}";
 
-            JSONObject jsonBody = new JSONObject("{\"firstName\":\"" + ed_firstName.getText().toString() +
-                                                 "\",\"lastName\":\"" + ed_lastName.getText().toString() +
-                                                 "\",\"email\":\"" + ed_email.getText().toString() +
-                                                 "\",\"passwordHash\":\"" + hash +
-                                                 "\",\"userType\":\"" + ((RadioButton)findViewById(rg_type.getCheckedRadioButtonId())).getText().toString() + "\"}");
+                StringRequest stringRequest = new StringRequest(Request.Method.POST, URL, new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        Log.i("VOLLEY", response);
+                    }
+                }, new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        Log.e("VOLLEY", error.toString());
+                    }
+                }) {
+                    @Override
+                    public String getBodyContentType() {
+                        return "application/json; charset=utf-8";
+                    }
 
-            //Toast.makeText(getApplicationContext(), hash.length(), Toast.LENGTH_SHORT).show();
-//request a json object response
-            JsonObjectRequest jsonRequest = new JsonObjectRequest(Request.Method.POST, url, jsonBody, new Response.Listener<JSONObject>() {
-                @Override
-                public void onResponse(JSONObject response) {
+                    @Override
+                    public byte[] getBody() throws AuthFailureError {
+                        try {
+                            return requestBody == null ? null : requestBody.getBytes("utf-8");
+                        } catch (UnsupportedEncodingException uee) {
+                            VolleyLog.wtf("Unsupported Encoding while trying to get the bytes of %s using %s", requestBody, "utf-8");
+                            return null;
+                        }
+                    }
 
-                    //now handle the response
-                    Toast.makeText(SignupActivity.this, "Successfully signed up.", Toast.LENGTH_LONG).show();
+                    @Override
+                    protected Response<String> parseNetworkResponse(NetworkResponse response) {
+                        String responseString = "";
+                        if (response != null) {
+                            responseString = String.valueOf(response.statusCode);
+                            // can get more details such as response.headers
+                        }
+                        return Response.success(responseString, HttpHeaderParser.parseCacheHeaders(response));
+                    }
+                };
 
-                }
-            }, new Response.ErrorListener() {
-                @Override
-                public void onErrorResponse(VolleyError error) {
+                requestQueue.add(stringRequest);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
 
-                    //handle the error
-                    Toast.makeText(SignupActivity.this, "An error occurred.", Toast.LENGTH_LONG).show();
-                    error.printStackTrace();
 
-                }
-            }) {    //this is the part, that adds the header to the request
-                @Override
-                public Map<String, String> getHeaders() {
-                    Map<String, String> params = new HashMap<String, String>();
-                    params.put("content-type", "application/json");
-                    return params;
-                }
-            };
 
-// Add the request to the queue
-            Volley.newRequestQueue(this).add(jsonRequest);
+
 
 
         }

@@ -7,6 +7,7 @@ import android.content.res.AssetManager;
 import android.os.Environment;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
@@ -15,6 +16,7 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import com.android.volley.*;
+import com.android.volley.toolbox.HttpHeaderParser;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
@@ -30,6 +32,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Type;
 import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
@@ -118,87 +121,51 @@ public class MainActivity extends AppCompatActivity {
             }
         }
 
-        public void login() throws JSONException, NoSuchAlgorithmException { //metoda ce va trimite spre activitatea urmatoare de intrare in "camera"
-            /*RequestQueue queue = Volley.newRequestQueue(this);
-
-            String url = "http://192.168.0.103/Login?username=" + et_email.getText() + "&password=" + et_password.getText();
-            StringRequest stringRequest = new StringRequest(Request.Method.POST, url,
-                    new Response.Listener<String>() {
-                        @Override
-                        public void onResponse(String response) {
-                            //TODO: save secret key locally
+        public void login() throws NoSuchAlgorithmException { //metoda ce va trimite spre activitatea urmatoare de intrare in "camera"
 
 
-                            Type t = result.getClass();
-                            result = new Gson().fromJson(response, t);
-                            //Toast.makeText(getApplicationContext(), result.Key + " " + result.UserType, Toast.LENGTH_LONG).show();
 
-                            if(result.UserType.toLowerCase() == "student") {
-                                Intent explicitIntent = new Intent(MainActivity.this, EnterRoomActivity.class);
-                                startActivity(explicitIntent);
-                            }
-                            else { //Is teacher
-                                Intent explicitIntent = new Intent(MainActivity.this, ProffesorBoardActivity.class);
-                                startActivity(explicitIntent);
-                            }
-                        }
-                    }, new Response.ErrorListener() {
-                        @Override
-                        public void onErrorResponse(VolleyError error) {
-                            Toast.makeText(getApplicationContext(), error.toString(), Toast.LENGTH_LONG).show();
-                        }
-            });
-            queue.add(stringRequest);  */
-
-            String url = "https://webtech-opricavictor.c9users.io:8080/login";
             String loginhash = Sha.hash256(et_password.getText().toString());
-//create post data as JSONObject - if your are using JSONArrayRequest use obviously an JSONArray :)
-            final JSONObject jsonBody = new JSONObject("{\"email\":\"" + et_email.getText() +
-                    "\",\"passwordHash\":\"" + loginhash + "\"}");
 
+            try {
+                RequestQueue requestQueue = Volley.newRequestQueue(this);
+                String URL = "http://quyzygy.us/login?email=" + et_email.getText().toString() + "&passwordHash=" + loginhash;
 
+                StringRequest stringRequest = new StringRequest(Request.Method.POST, URL, new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
 
+                        Toast.makeText(getApplicationContext(), response, Toast.LENGTH_LONG).show();
 
-//request a json object response
-            JsonObjectRequest jsonRequest = new JsonObjectRequest(Request.Method.POST, url, jsonBody, new Response.Listener<JSONObject>() {
-                @Override
-                public void onResponse(JSONObject response) {
+                        String[] temp = response.split("\"");
 
-                    //now handle the response
-                    String[] temp = response.toString().split("\"");
+                        loginPrefsEditor.putString("sk", temp[3]);
+                        loginPrefsEditor.commit();
 
+                        if (true){
+                            Intent explicitIntent = new Intent(MainActivity.this, ProffesorBoardActivity.class);
+                            startActivityForResult(explicitIntent, 1);
+                        }else {
+                            Intent explicitIntent = new Intent(MainActivity.this, EnterRoomActivity.class);
+                            startActivityForResult(explicitIntent, 1);
+                        }
+                    }
+                }, new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        Log.e("VOLLEY", error.toString());
+                    }
+                }) {
+                    @Override
+                    public String getBodyContentType() {
+                        return "application/json; charset=utf-8";
+                    }
+                };
 
-                    loginPrefsEditor.putString("sk", temp[3]);
-                    loginPrefsEditor.commit();
-
-                    Toast.makeText(getApplicationContext(), loginPreferences.getString("sk", ""),Toast.LENGTH_LONG).show();
-
-
-                    Intent explicitIntent = new Intent(MainActivity.this, EnterRoomActivity.class);
-                    startActivityForResult(explicitIntent, 1);
-
-                }
-            }, new Response.ErrorListener() {
-                @Override
-                public void onErrorResponse(VolleyError error) {
-
-                    //handle the error
-                    Toast.makeText(MainActivity.this, "An error occurred.", Toast.LENGTH_SHORT).show();
-                    error.printStackTrace();
-
-                }
-            }) {    //this is the part, that adds the header to the request
-                @Override
-                public Map<String, String> getHeaders() {
-                    Map<String, String> params = new HashMap<String, String>();
-                    params.put("content-type", "application/json");
-                    return params;
-                }
-            };
-
-// Add the request to the queue
-            Volley.newRequestQueue(this).add(jsonRequest);
-
+                requestQueue.add(stringRequest);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
 
 
         }

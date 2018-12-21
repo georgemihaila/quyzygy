@@ -22,4 +22,6 @@ public class ProffesorBoardActivity extends AppCompatActivity {
         Intent explicitIntent = new Intent(ProffesorBoardActivity.this, MainActivity.class);
         startActivity(explicitIntent);
     }
+
+
 }
