@@ -13,15 +13,17 @@ public class ProffesorBoardActivity extends AppCompatActivity {
         setContentView(R.layout.activity_proffesor_board);
     }
 
+    public void navigateToCreateQuiz(View view){
+        Intent explicitIntent = new Intent(ProffesorBoardActivity.this, CreateQuizActivity.class);
+        startActivity(explicitIntent);
+    }
+
     public void navigateToMainActivity(View view){
         Intent explicitIntent = new Intent(ProffesorBoardActivity.this, MainActivity.class);
         startActivity(explicitIntent);
     }
 
-    public void navigateToQuiz(View view){
-        Intent explicitIntent = new Intent(ProffesorBoardActivity.this, MainActivity.class);
-        startActivity(explicitIntent);
-    }
+
 
 
 }

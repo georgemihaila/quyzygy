@@ -15,4 +15,11 @@
     <string name="last_name">Last name:</string>
     <string name="first_name">First name:</string>
     <string name="e_mail">E-mail:</string>
+    <string name="duration">Duration:</string>
+    <string name="quiz_name">Quiz name</string>
+    <string name="add_question">Add Question</string>
+    <string-array name="types">
+        <item>Single answer</item>
+        <item>Multiple answer</item>
+    </string-array>
 </resources>
