@@ -18,6 +18,7 @@
     <string name="duration">Duration:</string>
     <string name="quiz_name">Quiz name</string>
     <string name="add_question">Add Question</string>
+    <string name="course">Course:</string>
     <string-array name="types">
         <item>Single answer</item>
         <item>Multiple answer</item>

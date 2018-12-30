@@ -96,7 +96,6 @@ public class SignupActivity extends AppCompatActivity {
         else {
             //save to DB
 
-            String url = "http://quyzygy.us/register";
 
             String hash = Sha.hash256(ed_pw.getText().toString());
 

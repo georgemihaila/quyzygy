@@ -120,6 +120,7 @@ public class MainActivity extends AppCompatActivity {
                     public void onResponse(String response) {
 
                         Toast.makeText(getApplicationContext(), response, Toast.LENGTH_LONG).show();
+                        Log.v("test", response);
 
                         String[] temp = response.split("\"");
 
