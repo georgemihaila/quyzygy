@@ -10,10 +10,10 @@
         android:id="@+id/tv_username"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="12dp"
+        android:layout_marginStart="16dp"
         android:layout_marginTop="8dp"
         android:layout_marginBottom="8dp"
-        android:text="@string/username"
+        android:text="@string/email"
         android:textSize="26sp"
         app:layout_constraintBottom_toBottomOf="@+id/et_username"
         app:layout_constraintStart_toStartOf="parent"
@@ -58,9 +58,10 @@
         android:textSize="12sp"
         app:layout_constraintBottom_toTopOf="@+id/et_password"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.828"
         app:layout_constraintStart_toEndOf="@+id/tv_username"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.969" />
+        app:layout_constraintVertical_bias="0.975" />
 
     <EditText
         android:id="@+id/et_password2"
@@ -97,6 +98,7 @@
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
         android:text="@string/back"
+        android:background="@android:color/white"
         android:onClick="navigateToMainActivity"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />

@@ -85,7 +85,7 @@ public class SignupActivity extends AppCompatActivity {
         else {
             //save to DB
             RequestQueue queue = Volley.newRequestQueue(this);
-            String url = "http://192.168.0.103/SignUp?username=" + ed_username.getText() + "&password=" + ed_pw.getText() + "&usertype=" + (((RadioButton)findViewById(rg_type.getCheckedRadioButtonId())).getText().toString());
+            String url = "http://192.168.0.103/SignUp?email=" + ed_username.getText() + "&passwordHash=" + ed_pw.getText() + "&usertype=" + (((RadioButton)findViewById(rg_type.getCheckedRadioButtonId())).getText().toString());
             StringRequest stringRequest = new StringRequest(Request.Method.POST, url,
                     new Response.Listener<String>() {
                         @Override

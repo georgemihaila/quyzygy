@@ -175,7 +175,7 @@ app.post('/login', async (req, res)=>{
 			}
 			existingSKs.push(sk)
 			if (existingSKs.len == 1)
-				await AuthenticatedUsers.insertOrUpdate({Email:req.param('email'), SecretKeys:JSON.stringify(existingSKs)})
+				await AuthenticatedUsers.upsert({Email:req.param('email'), SecretKeys:JSON.stringify(existingSKs)})
 			else
 				await AuthenticatedUsers.update({Email:req.param('email'), SecretKeys:JSON.stringify(existingSKs)},
 			{where: { email: req.param('email')}})
