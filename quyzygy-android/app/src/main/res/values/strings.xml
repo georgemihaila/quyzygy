@@ -22,5 +22,6 @@
     <string-array name="types">
         <item>Single answer</item>
         <item>Multiple answer</item>
+        <item>Open answer</item>
     </string-array>
 </resources>

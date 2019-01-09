@@ -7,9 +7,11 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.RadioButton;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.android.volley.AuthFailureError;
@@ -35,7 +37,7 @@ public class CreateQuizActivity extends AppCompatActivity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_create_quiz);
-        parentLinearLayout = (LinearLayout) findViewById(R.id.parent_linear_layout);
+        parentLinearLayout = (LinearLayout) findViewById(R.id.sv_LinearLayout);
         loginPreferences = getSharedPreferences("loginPrefs", MODE_PRIVATE);
     }
     public void onAddQuestion(View v) {
@@ -51,62 +53,21 @@ public class CreateQuizActivity extends AppCompatActivity {
 
 
     public void saveQuiz (View v){
-
-
-
-        try {
-            RequestQueue requestQueue = Volley.newRequestQueue(this);
-            String URL = "http://quyzygy.us/createQuiz?sk=" + loginPreferences.getString("sk", "");
-            et_quizName = (EditText)findViewById(R.id.et_quizName);
-            et_courseName = (EditText)findViewById(R.id.et_courseName);
-
-            final String requestBody = "{" + "\"ID\":\"" + 0 + "\"" +
-                    "\"Author\":\"" + loginPreferences.getString("username","").toString() +
-                    "\",\"CourseName\":\"" + et_courseName.getText().toString() +
-                    "\",\"Questions\":\"" + 10000001 + "\"}";
-
-            StringRequest stringRequest = new StringRequest(Request.Method.POST, URL, new Response.Listener<String>() {
-                @Override
-                public void onResponse(String response) {
-                    Log.i("VOLLEY", response);
-                    Toast.makeText(getApplicationContext(), "It worked", Toast.LENGTH_SHORT).show();
-                }
-            }, new Response.ErrorListener() {
-                @Override
-                public void onErrorResponse(VolleyError error) {
-                    Log.e("VOLLEY", error.toString());
-                }
-            }) {
-                @Override
-                public String getBodyContentType() {
-                    return "application/json; charset=utf-8";
-                }
-
-                @Override
-                public byte[] getBody() throws AuthFailureError {
-                    try {
-                        return requestBody == null ? null : requestBody.getBytes("utf-8");
-                    } catch (UnsupportedEncodingException uee) {
-                        VolleyLog.wtf("Unsupported Encoding while trying to get the bytes of %s using %s", requestBody, "utf-8");
-                        return null;
-                    }
-                }
-
-                @Override
-                protected Response<String> parseNetworkResponse(NetworkResponse response) {
-                    String responseString = "";
-                    if (response != null) {
-                        responseString = String.valueOf(response.statusCode);
-                        // can get more details such as response.headers
-                    }
-                    return Response.success(responseString, HttpHeaderParser.parseCacheHeaders(response));
-                }
-            };
-
-            requestQueue.add(stringRequest);
-        } catch (Exception e) {
-            e.printStackTrace();
+        Log.v("0x000AAAB", "" + parentLinearLayout.getChildCount());
+        for (int i = 0; i < parentLinearLayout.getChildCount(); i++){
+           try{
+               LinearLayout questionLayout = (LinearLayout)parentLinearLayout.getChildAt(i);
+               LinearLayout headerLayout = (LinearLayout)questionLayout.getChildAt(0);
+               LinearLayout _1 = (LinearLayout)questionLayout.getChildAt(1);
+               LinearLayout _2 = (LinearLayout)questionLayout.getChildAt(2);
+               LinearLayout _3 = (LinearLayout)questionLayout.getChildAt(3);
+               LinearLayout _4 = (LinearLayout)questionLayout.getChildAt(4);
+               String question = ((EditText)headerLayout.getChildAt(0)).getText().toString();
+               Log.v("0x000AAAB", question);
+           }
+           catch(Exception e){
+                Log.v("0x000AAAB", e.toString());
+            }
         }
-
     }
 }

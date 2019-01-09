@@ -22,7 +22,7 @@
         <activity android:name=".EnterRoomActivity" />
         <activity android:name=".QuizActivity" />
         <activity android:name=".StudentGradesActivity" />
-        <activity android:name=".ProffesorBoardActivity" />
+        <activity android:name=".ProfessorBoardActivity" />
         <activity android:name=".CreateQuizActivity"></activity>
     </application>
 

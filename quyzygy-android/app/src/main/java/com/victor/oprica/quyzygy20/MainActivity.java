@@ -17,9 +17,12 @@ import android.widget.Toast;
 import com.android.volley.*;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
+import com.google.gson.Gson;
+import com.victor.oprica.quyzygy20.entities.LoginResult;
 
 import org.json.JSONException;
 
+import java.security.InvalidParameterException;
 import java.security.NoSuchAlgorithmException;
 
 
@@ -32,6 +35,7 @@ public class MainActivity extends AppCompatActivity {
     private Button btn_login;
     private SharedPreferences loginPreferences;
     private SharedPreferences.Editor loginPrefsEditor;
+    private SharedPreferences keyPreferences;
     private Boolean saveLogin;
 
     @Override
@@ -44,7 +48,19 @@ public class MainActivity extends AppCompatActivity {
         et_password = (EditText) findViewById(R.id.et_password);
         cb_rememberme = (CheckBox) findViewById(R.id.cb_rememberuser);
         loginPreferences = getSharedPreferences("loginPrefs", MODE_PRIVATE);
+        keyPreferences = getSharedPreferences("keyPrefs", MODE_PRIVATE);
         loginPrefsEditor = loginPreferences.edit();
+
+        //Navigate to main page if user is already signed in
+        /*
+        String ut = keyPreferences.getString("ut", "");
+        if (ut == "Professor"){
+            Intent explicitIntent = new Intent(MainActivity.this, ProffesorBoardActivity.class);
+            startActivityForResult(explicitIntent, 1);
+        }else if (ut == "Student") {
+            Intent explicitIntent = new Intent(MainActivity.this, EnterRoomActivity.class);
+            startActivityForResult(explicitIntent, 1);
+        }*/
 
         readLoginData();
 
@@ -120,20 +136,20 @@ public class MainActivity extends AppCompatActivity {
                     public void onResponse(String response) {
 
                         Toast.makeText(getApplicationContext(), response, Toast.LENGTH_LONG).show();
-                        Log.v("test", response);
-
-                        String[] temp = response.split("\"");
-
-                        loginPrefsEditor.putString("sk", temp[3]);
+                        Log.v("0x000AAAA", response);
+                        LoginResult res = new Gson().fromJson(response, LoginResult.class);
+                        loginPrefsEditor.putString("sk", res.secretKey);
                         loginPrefsEditor.commit();
-
-                        if (true){
-                            Intent explicitIntent = new Intent(MainActivity.this, ProffesorBoardActivity.class);
+                        Log.v("0x000AAAA", "UserType: |" + res.userType.toLowerCase() + "|");
+                        keyPreferences.edit().putString("sk", res.secretKey).commit();
+                        keyPreferences.edit().putString("ut", res.userType).commit();
+                        if (res.userType.toLowerCase().equals("professor")){
+                            Intent explicitIntent = new Intent(MainActivity.this, ProfessorBoardActivity.class);
                             startActivityForResult(explicitIntent, 1);
-                        }else {
+                        } else if (res.userType.toLowerCase().equals("student")) {
                             Intent explicitIntent = new Intent(MainActivity.this, EnterRoomActivity.class);
                             startActivityForResult(explicitIntent, 1);
-                        }
+                        } else throw new InvalidParameterException("Invalid UserType provided.");
                     }
                 }, new Response.ErrorListener() {
                     @Override
