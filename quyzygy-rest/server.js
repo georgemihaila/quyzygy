@@ -6,7 +6,7 @@ const sha256 = require('sha256');
 const Op = Sequelize.Op;
 
 const app = express();
-const sequelize = new Sequelize('quyzygy_db','root','',{
+const sequelize = new Sequelize('quyzygy_db','root','123456',{
 	dialect : 'mysql',
 	define : {
 		timestamps : false
@@ -45,7 +45,7 @@ const Users = sequelize.define('Users', {
 	    type : Sequelize.STRING,
 	    allowNull : false,
 	    validate : { 
-	        len : 64
+	        len : [0, 64]
 	    }
 	},
 	userType: {
@@ -74,13 +74,21 @@ const Quizzes = sequelize.define('Quizzes', {
 		allowNull: false,
 		len: [0, 8192]
 	},
+	QuizName:{
+		type:Sequelize.STRING,
+		allowNull:false
+	},
+	Duration:{
+		type:Sequelize.INTEGER,
+		allowNull:false
+	},
+	Public:{
+		type:Sequelize.BOOLEAN,
+		allowNull:false
+	}
 })
 
 const Questions = sequelize.define('Questions', {
-	ID: {
-		type: Sequelize.INTEGER,
-		allowNull: false
-	},
 	Author:{
 		type: Sequelize.STRING,
 		allowNull: false,
@@ -148,7 +156,7 @@ const AuthenticatedUsers = sequelize.define('AuthenticatedUsers',{
 
 app.post('/login', async (req, res)=>{
 	try {
-		let result = await Users.findAndCountAll({
+		var result = await Users.findAll({
 			where:{
 				email:req.param("email"),
 				passwordHash:req.param("passwordHash")
@@ -174,12 +182,13 @@ app.post('/login', async (req, res)=>{
 
 			}
 			existingSKs.push(sk)
-			if (existingSKs.len == 1)
-				await AuthenticatedUsers.upsert({Email:req.param('email'), SecretKeys:JSON.stringify(existingSKs)})
+			if (existingSKs.length == 1)
+				await AuthenticatedUsers.insertOrUpdate({Email:req.param('email'), SecretKeys:JSON.stringify(existingSKs)})
 			else
 				await AuthenticatedUsers.update({Email:req.param('email'), SecretKeys:JSON.stringify(existingSKs)},
 			{where: { email: req.param('email')}})
-			res.status(200).json({secretKey:sk})
+
+			res.status(200).json({secretKey:sk, userType:result[0].userType})
 		}
 	}
 	catch(e){
@@ -279,8 +288,9 @@ app.post('/createQuestion', async (req, res) => {
 			res.status(401).json({error:'Unauthorized'})
 			return
 		}
-		await Questions.create(req.body)
-		res.status(201).json({message : 'created'})
+		var id = -1
+		await Questions.create(req.body).then(function(x){id=x.id})
+		res.status(201).json({Created : id})
 	}
 	catch(e){
 		console.warn(e)
@@ -310,6 +320,26 @@ app.get('/myQuestions', async (req, res)=>{
 //#endregion
 
 //#region Grade manipulation
+
+app.get('/myGrades', async(req, res) =>{
+	try{
+		if (!await validateUser(req)){
+			res.status(401).json({error:'Unauthorized'})
+			return
+		}
+		var email = await getEmailForLoggedUser(req)
+		var grades = await Grades.findAll({
+			where:{
+				userID:email
+			}
+		})
+		res.status(200).json(grades)
+	}
+	catch(e){
+		console.warn(e)
+		res.status(500).json({error : e.message})
+	}
+})
 
 //#endregion
 
@@ -393,4 +423,6 @@ app.get('/test', async (req, res)=>{
 //#endregion
 
 //User.create({firstName:'Ioana',lastName:'Pasarin',email:'ioana.pasarin@ase.ro',passwordHash:'03ac674216f3e15c761ee1a5e255f067953623c8b388b4459e13f978d7c846f4',userType:'Student'});
+var cors = require('cors');
+app.use(cors());
 app.listen(8080)
