@@ -1,12 +1,21 @@
 'use strict'
-var express = require('express');
-var bodyParser = require('body-parser');
-const Sequelize = require('sequelize');
-const sha256 = require('sha256');
+var express = require('express')
+var bodyParser = require('body-parser')
+const Sequelize = require('sequelize')
+const sha256 = require('sha256')
+const WebSocket = require('ws')
+
 const Op = Sequelize.Op;
 
 const app = express();
-const sequelize = new Sequelize('quyzygy_db','root','123456',{
+
+app.use(function(req, res, next) {
+	res.header("Access-Control-Allow-Origin", "*");
+	res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+	next();
+  });
+
+const sequelize = new Sequelize('quyzygy_db','root','',{
 	dialect : 'mysql',
 	define : {
 		timestamps : false
@@ -85,6 +94,15 @@ const Quizzes = sequelize.define('Quizzes', {
 	Public:{
 		type:Sequelize.BOOLEAN,
 		allowNull:false
+	},
+	Geofencing:{
+		type:Sequelize.BOOLEAN,
+		allowNull:false
+	},
+	GeofencingData:{
+		type:Sequelize.STRING,
+		allowNull:true,
+		len:[0,4096]
 	}
 })
 
@@ -106,12 +124,17 @@ const Questions = sequelize.define('Questions', {
 	},
 	Answers:{
 		type:Sequelize.STRING,
-		allowNull:false,
+		allowNull:true,
 		len:[0,4196]
 	},
 	Points:{
 		type:Sequelize.INTEGER,
 		allowNull:false
+	},
+	CorrectAnswer:{
+		type:Sequelize.STRING,
+		allowNull:false,
+		len:[0, 512]
 	}
 })
 
@@ -145,6 +168,30 @@ const AuthenticatedUsers = sequelize.define('AuthenticatedUsers',{
 		type:Sequelize.STRING,
 		allowNull:true,
 		len:[0,4096]
+	}
+})
+
+const ActivatedQuizzes = sequelize.define('ActivatedQuizzes', {
+	QuizID:{
+		type:Sequelize.INTEGER,
+		allowNull:false
+	},
+	AccessCode:{
+		type:Sequelize.INTEGER,
+		allowNull:false
+	},
+	Students:{
+		type:Sequelize.STRING,
+		allowNull:true,
+		len:[0, 1048576]
+	},
+	StartTime:{
+		type:Sequelize.TIME,
+		allowNull:true
+	},
+	EndTime:{
+		type:Sequelize.TIME,
+		allowNull:true
 	}
 })
 
@@ -278,6 +325,56 @@ app.get('/myQuizzes', async (req, res)=>{
 	}
 })
 
+var liveQuizzes = {}
+
+app.post('/activateQuiz', async(req, res)=>{
+	try{
+		if (!await validateUser(req)){
+			res.status(401).json({error:'Unauthorized'})
+			return
+		}
+		var code = 1000 + getRandomInt(8999)
+		var quizID = req.param('quizID')
+		var qres = await ActivatedQuizzes.findAll({
+			where:{
+				QuizID : quizID
+			}})
+		if (qres.length == 0){
+			await ActivatedQuizzes.insertOrUpdate({QuizID:quizID,AccessCode:code,Students:"",StartTime:"",EndTime:""})
+			liveQuizzes[code] = {Students:{},StartTime:new Date(0,0,0,0,0,0,0),EndTime:new Date(0,0,0,0,0,0,0)}
+			res.status(200).json({success:true,"AccessCode":code})
+		} else{
+			if (!liveQuizzes.hasOwnProperty(qres[0].AccessCode)){
+				liveQuizzes[qres[0].AccessCode] = {Students:{},StartTime:new Date(0,0,0,0,0,0,0),EndTime:new Date(0,0,0,0,0,0,0)}
+			}
+			res.status(200).json({success:true,"AccessCode":qres[0].AccessCode})
+		}
+	}
+	catch(e){
+		console.warn(e)
+		res.status(500).json({error:e.message})
+	}
+})
+
+app.post("/startQuiz", async (req, res)=>{
+	try{
+		if (!await validateUser(req)){
+			res.status(401).json({error:'Unauthorized'})
+			return
+		}
+		var quizID = req.param('quizID')
+		liveQuiz_WSS.clients.forEach(function each(client) {
+			if (client.readyState === WebSocket.OPEN) {
+				client.send(JSON.stringify({Action:"QuizStarted", Data:[]}))
+			}
+		})
+	}
+	catch(e){
+		console.warn(e)
+		res.status(500).json({error:e.message})
+	}
+})
+
 //#endregion
 
 //#region Question manipulation
@@ -363,6 +460,9 @@ function generateRandomSecretKey(){
 async function validateUser(request){
 	return (await checkSecretKey(request.param('sk')))
 }
+async function isAuthenticated(wsClientPacket){
+	return (await checkSecretKey(wsClientPacket.Identity.SecretKey))
+}
 
 async function getEmailForLoggedUser(request){
 	try {
@@ -422,7 +522,155 @@ app.get('/test', async (req, res)=>{
 
 //#endregion
 
-//User.create({firstName:'Ioana',lastName:'Pasarin',email:'ioana.pasarin@ase.ro',passwordHash:'03ac674216f3e15c761ee1a5e255f067953623c8b388b4459e13f978d7c846f4',userType:'Student'});
-var cors = require('cors');
-app.use(cors());
+var cors = require('cors')
+app.use(cors())
+app.options('*', cors())
+app.use(express.static("/"));
+
 app.listen(8080)
+
+// #region WebSocket server
+
+const quizStatus_WSS = new WebSocket.Server({
+	port: 8081
+})
+
+quizStatus_WSS.on('connection', function connection(ws){
+	ws.on('message', function incoming(message){
+		console.log('quizStatus_WSS received: %s', message)
+	})
+	ws.send(JSON.stringify({Success:true,Data:"Connected"}))
+})
+
+const liveQuiz_WSS = new WebSocket.Server({
+	port:8082
+})
+
+liveQuiz_WSS.on('connection', function connection(ws){
+	ws.id = quizStatus_WSS.getUniqueID()
+	ws.on('message', async function incoming(wsClientPacket){
+		try{
+				var wsc = JSON.parse(wsClientPacket)
+//#region WebSocket client validation and identification
+				//Validate websocket identity
+				if (liveQuiz_WSS.validateIdentity(wsc)){
+				} else{
+					//Validate secret key identity
+					if (await isAuthenticated(wsc)){
+						liveQuiz_WSS.addIdentity(wsc)
+					}
+					else{
+						ws.send(JSON.stringify({Success:false,Data:"Invalid identity"}))
+						return
+					}
+				}
+//#endregion
+				switch(wsc.Action){
+					case "JoinQuiz":
+						if (liveQuizzes.hasOwnProperty(wsc.Identity.AccessCode)){
+							//Add user to live quiz if needed
+							if (!liveQuizzes[wsc.Identity.AccessCode].Students.hasOwnProperty(wsc.Identity.WSID)){
+								let lq = shuffle(await getQuestionsOfQuizByAccessCode(wsc.Identity.AccessCode))
+								liveQuizzes[wsc.Identity.AccessCode].Students[wsc.Identity.WSID] = { Answers:[], CurrentQuestion:lq[0],LeftQuestions:lq}
+								quizStatus_WSS.clients.forEach(function each(client) {
+									if (client !== ws && client.readyState === WebSocket.OPEN) {
+									  client.send(JSON.stringify({Action:"QuizProgressChanged", Data:liveQuizzes[wsc.Identity.AccessCode].Students}))
+									}
+								})
+							}
+							ws.send(JSON.stringify({Success:true}))
+						}
+						else{
+							ws.send(JSON.stringify({Success:false,Data:"Invalid quiz ID"}))
+						}
+					break;
+					case "NextQuestion":
+						let currentQuestion = (await Questions.findAll({where:{ID:liveQuizzes[wsc.Identity.AccessCode].Students[wsc.Identity.WSID].CurrentQuestion}}))[0];
+						ws.send(JSON.stringify({Success:true,Data:currentQuestion}))
+					break;
+					case "PostAnswer":
+						let questionID = liveQuizzes[wsc.Identity.AccessCode].Students[wsc.Identity.WSID].CurrentQuestion;
+						let answer = wsc.Data;
+						liveQuizzes[wsc.Identity.AccessCode].Students[wsc.Identity.WSID].Answers.push({QuestionID:questionID, Answer:answer})
+						liveQuizzes[wsc.Identity.AccessCode].Students[wsc.Identity.WSID].LeftQuestions = removeFirst(liveQuizzes[wsc.Identity.AccessCode].Students[wsc.Identity.WSID].LeftQuestions);
+						if (liveQuizzes[wsc.Identity.AccessCode].Students[wsc.Identity.WSID].LeftQuestions.length > 0){
+							liveQuizzes[wsc.Identity.AccessCode].Students[wsc.Identity.WSID].CurrentQuestion = liveQuizzes[wsc.Identity.AccessCode].Students[wsc.Identity.WSID].LeftQuestions[0];
+							ws.send(JSON.stringify({Success:true}))
+						}
+						else{
+							ws.send(JSON.stringify({Success:true, Data:"Completed!"}))
+						}
+						quizStatus_WSS.clients.forEach(function each(client) {
+							if (client !== ws && client.readyState === WebSocket.OPEN) {
+							  client.send(JSON.stringify({Action:"QuizProgressChanged", Data:liveQuizzes[wsc.Identity.AccessCode].Students}))
+							}
+						})
+					break;
+					default:
+						ws.send(JSON.stringify({Success:false,Data:"Unknown"}))
+					break;
+				}
+		}
+		catch(e){
+			console.log(e)
+			ws.send(JSON.stringify({Success:false,Data:"Invalid JSON"}))
+		}
+	})
+	ws.send(JSON.stringify({Success:true,Data:ws.id}))
+})
+
+liveQuiz_WSS.clientIdentities = {}
+
+liveQuiz_WSS.validateIdentity = function(wsClientPacket){
+	return liveQuiz_WSS.clientIdentities.hasOwnProperty(wsClientPacket.Identity.SecretKey) && liveQuiz_WSS.clientIdentities[wsClientPacket.Identity.SecretKey] == wsClientPacket.Identity.WSID
+}
+
+liveQuiz_WSS.addIdentity = function(wsClientPacket){
+	liveQuiz_WSS.clientIdentities[wsClientPacket.Identity.SecretKey] = wsClientPacket.Identity.WSID
+}
+
+quizStatus_WSS.getUniqueID = function () {
+    function s4() {
+        return Math.floor((1 + Math.random()) * 0x10000).toString(16).substring(1);
+    }
+    return s4() + s4() + '-' + s4();
+};
+
+async function getQuestionsOfQuizByAccessCode(qiz){
+	try{
+		let q = (await ActivatedQuizzes.findAll({where:{AccessCode : qiz}}))[0].QuizID
+		return JSON.parse((await Quizzes.findAll({where:{ID:q}}))[0].Questions)
+	}
+	catch(e){
+		console.log(e)
+	}
+}
+
+function shuffle(array) {
+    let counter = array.length;
+
+    // While there are elements in the array
+    while (counter > 0) {
+        // Pick a random index
+        let index = Math.floor(Math.random() * counter);
+
+        // Decrease counter by 1
+        counter--;
+
+        // And swap the last element with it
+        let temp = array[counter];
+        array[counter] = array[index];
+        array[index] = temp;
+    }
+
+    return array;
+}
+
+function removeFirst(arr){
+	var temp = [];
+	for (let i = 1; i < arr.length; i++)
+		temp.push(arr[i]);
+	return temp;
+}
+
+  //#endregion
