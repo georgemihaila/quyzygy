@@ -11,11 +11,11 @@ const app = express();
 
 app.use(function(req, res, next) {
 	res.header("Access-Control-Allow-Origin", "*");
-	res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+	res.header("Access-Control-Allow`-Headers", "Origin, X-Requested-With, Content-Type, Accept");
 	next();
   });
 
-const sequelize = new Sequelize('quyzygy_db','root','',{
+const sequelize = new Sequelize('quyzygy_db','root','123456',{
 	dialect : 'mysql',
 	define : {
 		timestamps : false
@@ -365,9 +365,10 @@ app.post("/startQuiz", async (req, res)=>{
 		var quizID = req.param('quizID')
 		liveQuiz_WSS.clients.forEach(function each(client) {
 			if (client.readyState === WebSocket.OPEN) {
-				client.send(JSON.stringify({Action:"QuizStarted", Data:[]}))
+				client.send(JSON.stringify({Success:true,Action:"QuizStarted", Data:""}))
 			}
 		})
+		res.status(200).json({Success:true})
 	}
 	catch(e){
 		console.warn(e)

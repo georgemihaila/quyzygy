@@ -1,6 +1,5 @@
 <resources>
     <string name="app_name">Quyzygy2.0</string>
-    <string name="email">Email:</string>
     <string name="password">Password:</string>
     <string name="repeat_password">Repeat password:</string>
     <string name="back">Back</string>
@@ -13,4 +12,16 @@
     <string name="invite_code">Invite code</string>
     <string name="log_out">Log out</string>
     <string name="see_grades">See grades</string>
+    <string name="last_name">Last name:</string>
+    <string name="first_name">First name:</string>
+    <string name="e_mail">E-mail:</string>
+    <string name="duration">Duration:</string>
+    <string name="quiz_name">Quiz name</string>
+    <string name="add_question">Add Question</string>
+    <string name="course">Course:</string>
+    <string-array name="types">
+        <item>Single answer</item>
+        <item>Multiple answer</item>
+        <item>Open answer</item>
+    </string-array>
 </resources>
