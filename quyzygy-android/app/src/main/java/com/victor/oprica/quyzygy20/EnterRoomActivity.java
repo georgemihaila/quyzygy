@@ -68,13 +68,13 @@ public class EnterRoomActivity extends AppCompatActivity {
     private final class EchoWebSocketListener extends WebSocketListener {
         private static final int NORMAL_CLOSURE_STATUS = 1000;
         public Identity identity;
+        public EchoWebSocketListener(Identity i){
+            identity = i;
+        }
         @Override
         public void onOpen(WebSocket webSocket, Response response) {
-            WebSocketClientPacket packet = new WebSocketClientPacket();
-            packet.Identity = this.identity;
-            packet.Action = "JoinQuiz";
-            String s = packet.toJson();
-            webSocket.send(s);
+            this.identity.WSID = "";
+            webSocket.send(identity.toJson());
         }
         @Override
         public void onMessage(WebSocket webSocket, String text) {
@@ -83,6 +83,10 @@ public class EnterRoomActivity extends AppCompatActivity {
             if (packet.Success){
                 if (identity.WSID == null || identity.WSID == ""){
                     identity.WSID = packet.Data;
+                    WebSocketClientPacket packe0t = new WebSocketClientPacket();
+                    packe0t.Identity = identity;
+                    packe0t.Action = "JoinQuiz";
+                    webSocket.send(packe0t.toJson());
                 }
                 else{
                     if (packet.Action != null && packet.Action.equals("QuizStarted")){
@@ -96,8 +100,10 @@ public class EnterRoomActivity extends AppCompatActivity {
                 if (packet.Data.equals("Invalid quiz ID")){
                     invalidQuiz();
                 }
+                /*
                 webSocket.close(NORMAL_CLOSURE_STATUS, null);
                 enableControls();
+                */
             }
         }
         @Override
@@ -119,8 +125,7 @@ public class EnterRoomActivity extends AppCompatActivity {
         output.setText("");
         client = new OkHttpClient();
         Request request = new Request.Builder().url("ws://79.115.188.173:8082").build();
-        EchoWebSocketListener listener = new EchoWebSocketListener();
-        listener.identity = this.identity;
+        EchoWebSocketListener listener = new EchoWebSocketListener(identity);
         WebSocket ws = client.newWebSocket(request, listener);
         client.dispatcher().executorService().shutdown();
     }
@@ -154,6 +159,9 @@ public class EnterRoomActivity extends AppCompatActivity {
                 et_invite.setEnabled(true);
                 joinBtn.setEnabled(true);
                 identity = i;
+                keyPreferences.edit().putString("wsid", i.WSID).commit();
+                keyPreferences.edit().putString("acc", String.valueOf(i.AccessCode)).commit();
+
                 Toast.makeText(getApplicationContext(), "Quiz started!", Toast.LENGTH_LONG).show();
                 Intent explicitIntent = new Intent(EnterRoomActivity.this, QuizActivity.class);
                 startActivityForResult(explicitIntent, 1);

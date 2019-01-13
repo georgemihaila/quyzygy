@@ -584,11 +584,11 @@ liveQuiz_WSS.on('connection', function connection(ws){
 						else{
 							ws.send(JSON.stringify({Success:false,Data:"Invalid quiz ID"}))
 						}
-					break;
+					return;
 					case "NextQuestion":
 						let currentQuestion = (await Questions.findAll({where:{ID:liveQuizzes[wsc.Identity.AccessCode].Students[wsc.Identity.WSID].CurrentQuestion}}))[0];
 						ws.send(JSON.stringify({Success:true,Data:currentQuestion}))
-					break;
+					return;
 					case "PostAnswer":
 						let questionID = liveQuizzes[wsc.Identity.AccessCode].Students[wsc.Identity.WSID].CurrentQuestion;
 						let answer = wsc.Data;
@@ -606,15 +606,16 @@ liveQuiz_WSS.on('connection', function connection(ws){
 							  client.send(JSON.stringify({Action:"QuizProgressChanged", Data:liveQuizzes[wsc.Identity.AccessCode].Students}))
 							}
 						})
-					break;
+					return;
 					default:
 						ws.send(JSON.stringify({Success:false,Data:"Unknown"}))
-					break;
+					return;
 				}
 		}
 		catch(e){
 			console.log(e)
 			ws.send(JSON.stringify({Success:false,Data:"Invalid JSON"}))
+			return
 		}
 	})
 	ws.send(JSON.stringify({Success:true,Data:ws.id}))

@@ -112,6 +112,8 @@ public class SignupActivity extends AppCompatActivity {
                     @Override
                     public void onResponse(String response) {
                         Log.i("VOLLEY", response);
+                        Intent explicitIntent = new Intent(getApplicationContext(), MainActivity.class);
+                        startActivityForResult(explicitIntent, 1);
                     }
                 }, new Response.ErrorListener() {
                     @Override

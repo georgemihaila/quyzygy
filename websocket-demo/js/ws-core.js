@@ -1,5 +1,5 @@
 var endpoint_LiveQuiz = "ws://127.0.0.1:8082";
-var endpoint_QuizStatus = "ws://127.0.0.1:8081";
+var endpoint_QuizStatus = "ws://79.115.188.173:8081";
 
 $(window).on('load', function(){
     //Student

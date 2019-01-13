@@ -1,4 +1,4 @@
-var endpoint_API = "http://127.0.0.1:8080/"
+var endpoint_API = "http://quyzygy.us/"
 
 $(window).on('load', function(){
     $("#loginButton").on('click', function(){
