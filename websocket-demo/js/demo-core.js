@@ -22,6 +22,23 @@ $(window).on('load', function(){
             $("#quizList").html(JSON.stringify(data));
         });
     });
+    $("#reg-btn").on('click', function(){
+        let hash = sha256($("#reg-psw").val());
+        console.log(hash);
+        $.ajax({
+            url: endpoint_API + "register",
+            type: "POST",
+            crossDomain: true,
+            contentType:"application/json",
+            data:JSON.stringify({firstName:$("#reg-fn").val(),lastName:$("#reg-ln").val(),email:$("#reg-email").val(),passwordHash:hash,userType:'Student'}),
+            success: function (response) {
+                console.log(response);
+            },
+            error: function (xhr, status) {
+                //alert("error");
+            }
+        });
+    });
     localStorageDemo();
 });
 
