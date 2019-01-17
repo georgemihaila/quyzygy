@@ -172,4 +172,10 @@ public class MainActivity extends AppCompatActivity {
         }
 
 
+    public void navigateToMaps(View view){
+        Intent explicitIntent = new Intent(MainActivity.this, MapsActivity.class);
+        startActivity(explicitIntent);
+    }
+
+
 }

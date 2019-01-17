@@ -4,16 +4,27 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.android.volley.RequestQueue;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
 import com.google.gson.Gson;
 import com.victor.oprica.quyzygy20.entities.Identity;
 import com.victor.oprica.quyzygy20.entities.WebSocketClientPacket;
 import com.victor.oprica.quyzygy20.entities.WebSocketServerPacket;
+
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.FileReader;
+import java.io.IOException;
 
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -177,4 +188,5 @@ public class EnterRoomActivity extends AppCompatActivity {
             }
         });
     }
+
 }

@@ -13,7 +13,7 @@
         android:layout_width="0dp"
         android:layout_height="match_parent"
         android:layout_weight="5"
-        android:hint="Question"/>
+        android:hint="@string/question"/>
 
         <Spinner
             android:id="@+id/spin_type"
@@ -43,7 +43,7 @@
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="5"
-            android:hint="Answer"/>
+            android:hint="@string/answer"/>
 
         <CheckBox
             android:layout_width="wrap_content"
@@ -64,12 +64,12 @@
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="5"
-            android:hint="Answer"/>
+            android:hint="@string/answer"/>
 
         <CheckBox
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            android:text="Correct" />
+            android:text="@string/correct" />
 
     </LinearLayout>
 
@@ -84,12 +84,12 @@
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="5"
-            android:hint="Answer"/>
+            android:hint="@string/answer"/>
 
         <CheckBox
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            android:text="Correct" />
+            android:text="@string/correct" />
 
     </LinearLayout>
 
@@ -104,12 +104,12 @@
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="5"
-            android:hint="Answer"/>
+            android:hint="@string/answer"/>
 
         <CheckBox
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            android:text="Correct" />
+            android:text="@string/correct" />
 
     </LinearLayout>
 
