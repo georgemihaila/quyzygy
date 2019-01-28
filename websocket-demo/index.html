@@ -1,0 +1,73 @@
+<html>
+    <head>
+        <script src="js/jquery-3.3.1.min.js"></script>
+        <script src="js/sha256.js"></script>
+        <script src="js/demo-core.js"></script>
+        <script src="js/ws-core.js"></script>
+        <link rel="stylesheet" href="css/styles.css"/>
+    </head>
+    <body>
+        <div>
+            <h1>Authentication demo</h1>
+            <p>Email</p>
+            <input id="emailBox" type="text" value="blue.carrot@vegetables.com"/>
+            <p>Password</p>
+            <input id="passwordBox" type="password" value="12345678"/>
+            <button id="loginButton">Login</button>
+        </div>
+        <div>
+            <o>Local storage demo:</o>
+            <p id="localStorageDemo"></p>
+        </div>
+        <div>
+            <h1>Quiz activation demo</h1>
+            <button id="getQB">Get my quizzes</button>
+            <p>My quizzes:</p>
+            <p id="quizList"></p>
+        </div>
+        <h1>Player demo:</h1>
+        <div id="game" class="game-container">
+            <p>Access code:</p>
+            <input type="text" id="jq-in" value="1437"/>
+            <button id="jq-btn">Join quiz</button>
+            <p id="jqstat1"></p>
+        </div>
+        <h1>Professor demo:</h1>
+        <div id="prof-container" class="professor-container">
+            <button id="actB" >Activate quiz width ID 1</button>
+            <p id="p11"></p>
+            <p id="p12"></p>
+        </div>
+        <h1>Registration demo:</h1>
+        <div>
+            <p>First name</p>
+            <input id="reg-fn" type="text" value="Yellow"/>
+            <p>Last name</p>
+            <input id="reg-ln" type="text" value="Microwave"/>
+            <p>Email</p>
+            <input id="reg-email" type="text" value="yellow.microwave@gigahertz.com"/>
+            <p>Password</p>
+            <input id="reg-psw" type="password" value="12345678"/>
+            <button id="reg-btn">Register</button>
+            <p id="reg-res"></p>
+        </div>
+
+        <fieldset>
+            <label>Option 1:</label>
+            <input type="radio" name='opt' id="a11"/>
+            <input type='text' id='a12'/>
+        </br>
+            <label>Option 2:</label>
+            <input type="radio" name='opt'  id="a21"/>
+            <input type='text' id='a22'/>
+        </br>
+            <label>Option 3:</label>
+            <input type="radio" name='opt' id="a31"/>
+            <input type='text' id='a32'/>
+        </br>
+            <label>Option 4:</label>
+            <input type="radio" name='opt' id="431"/>
+            <input type='text' id='a42'/>
+        </fieldset>
+    </body>
+</html>

@@ -1,0 +1,197 @@
+#UtilitySection{
+  color: black;
+  padding-top: 70px;
+  height: 400px;
+  background: url("../assets/swirl_pattern.png") repeat;
+}
+
+#AboutSection{
+  color: black;
+  height: 400px;
+  background: url("../assets/connect_@2X.png") repeat;
+}
+
+#DonateSection{
+  color: black;
+  height: 800px;
+  background: url("../assets/foggy_birds_@2X.png") repeat;
+}
+
+
+#SignUpSection{
+  color: black;
+  font-size: large;
+  height: 500px;
+  background: url("../assets/ignasi_pattern_s.png") repeat;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+#navbar{
+    background: url('../assets/pink_dust.png') repeat top;
+}
+
+#studentPage{
+    height: 100vh;
+    background: url('../assets/hip-square.png') repeat top;
+    display: flex;
+  justify-content: center;
+  align-items: center;
+  align-content: center;
+}
+
+#profPage{
+    height: 100vh;
+    background: url('../assets/tree_bark.png') repeat top;
+    display: flex;
+  justify-content: center;
+  align-items: center;
+align-content: center;
+}
+
+#loginForm{
+     display: flex;
+      justify-content: center;
+  align-items: center;
+  align-content: center;
+  flex-direction: column;
+  font-size: medium;
+}
+
+.mainSection{
+   height: 50vh;
+   display: flex;
+   justify-content: space-around;
+    align-items: center;
+align-content: center;
+flex-direction: column;
+}
+
+.btnClk{
+    background-color: #ffe6e6;
+  margin:0;
+  font-size: 30px;
+  color: black;
+  border-width: 2px;
+  border-color: black;
+  border-radius: 36px;
+  width: 300px;
+  height: 80px;
+}
+
+.btnClk:hover{
+  color: white;
+  background: transparent url("../assets/pink_dust.png") repeat top;
+}
+
+.btnProf{
+     background-color: #e6f2ff;
+  height: 70px;
+  font-size: 20px;
+  margin-left: 20px;
+  margin-right: 20px;
+}
+
+.logBtn{
+    height: 30px;
+    width: 90px;
+    border-radius: 16px;
+     font-size: small;
+     background-color:#f2f2f2;
+}
+
+label {
+    margin-right: 10px;
+    margin-top: 10px;
+    margin-bottom: 10px;
+  display: inline-block;
+  width: 140px;
+  text-align: right;
+}
+
+input{
+    border-radius: 6px;
+}
+
+form{
+    display: flex;
+    justify-content: center;
+  align-items: center;
+  align-content: center;
+  flex-direction: column;
+}
+
+.App-logo {
+    animation: spin infinite 20s linear;
+    height: 80px;
+}
+
+.App-header {
+    background-color: #222;
+    padding: 20px;
+    color: white;
+    text-align: center;
+}
+
+.App-intro {
+    font-size: large;
+}
+
+@keyframes spin {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+
+
+.createQuiz {
+  margin: auto;
+  width: 50%;
+}
+
+.myForm{
+  width: 100%;
+  background-color: #dfe6e9;
+  border-radius: 5px;
+  padding: 20px;
+}
+
+.formField{
+  width: 100%;
+  padding: 12px 20px;
+  margin: 8px 0;
+  display: block;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  box-sizing: border-box;
+}
+
+.myButton{
+  width: 100%;
+  background-color: #00b894;
+  color: white;
+  padding: 14px 20px;
+  margin: 8px 0;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.myList{
+  list-style: none;
+}
+
+.myListButton{
+  display: inline-block;
+  height: auto;
+  width: auto;
+  border-radius: 7px;
+  border: 1px solid #00b894;
+  margin: 3px 5px;
+}
+

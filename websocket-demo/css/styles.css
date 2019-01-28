@@ -1,0 +1,11 @@
+.game-container{
+    background-color: green;
+    width:500px;
+    height: 300px;
+}
+
+.professor-container{
+    background-color:black;
+    color:white;
+    width:500px;
+}
